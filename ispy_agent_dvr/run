@@ -1,23 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bashio
 
 # Get the folder configuration
-Folder="your_default_folder_name"
+Folder="$(bashio::config 'folder')"
 
 # Move to the /agent directory
 cd /agent || exit 1
 
 # Ensure required directories exist
-mkdir -p /data/Media /data/Commands
+bashio::fs.mkdir "/data/Media"
+bashio::fs.mkdir "/data/Commands"
 
 # Create symbolic links
 ln -sfn /data/Media Media
 ln -sfn /data/Commands Commands
 
-# Check if 'override' is set (modify condition as needed)
-if [[ "$override" == "true" ]]; then
-  mkdir -p "/share/${Folder}"
+# Check if 'override' is true and set up additional symlink
+if bashio::config.true 'override'; then
+  bashio::fs.mkdir "/share/${Folder}"
   ln -sfn "/share/${Folder}" Media/WebServerRoot/Media
 fi
 
-# Execute the Agent (replace './Agent' with the actual command to execute)
+# Execute the Agent
 ./Agent
